@@ -44,21 +44,29 @@ event irc_bot_addressed => sub {
 	my ( $self, $nickstr, $channel, $msg ) = @_[ OBJECT, ARG0, ARG1, ARG2 ];
 	my ( $nick ) = split /!/, $nickstr;
 	$self->debug($nick.' told me "'.$msg.'" on '.$channel);
-	if (my $zci = $self->ddg->zci($msg)) {
-		my $reply;
+	my $reply;
+	my $zci;
+	if ($msg =~ /your order/i or $msg =~ /your rules/i) {
+		$reply = "1. Serve the public trust, 2. Protect the innocent, 3. Uphold the law, 4. .... and dont track you! http://donttrack.us/";
+	} elsif ($zci = $self->ddg->zci($msg)) {
 		if ($zci->has_abstract) {
 			$reply = $zci->abstract;
+			$reply .= " (".$zci->abstract_source.")" if $zci->has_abstract_source;
+			$reply .= " ".$zci->abstract_url if $zci->has_abstract_url;
 		} elsif ($zci->has_answer) {
 			$reply = $zci->answer;
+			$reply .= " (".$zci->answer_type.")";
 		} elsif ($zci->has_definition) {
 			$reply = $zci->definition;
+			$reply .= " (".$zci->definition_source.")" if $zci->has_definition_source;
+			$reply .= " ".$zci->definition_url if $zci->has_definition_url;
 		} else {
 			$reply = "no clue...";
 		}
-		$self->privmsg( $channel => "$nick: ".$reply );
 	} else {
-		$self->privmsg( $channel => "$nick: 0 :(" );
+		$reply = '0 :(';
 	}
+	$self->privmsg( $channel => "$nick: ".$reply );
 };
 
 1;

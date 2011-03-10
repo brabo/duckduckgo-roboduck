@@ -1,4 +1,5 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
-	- First working base
+	- Added rules ;)
+	- Base functionality with gate to DDG
