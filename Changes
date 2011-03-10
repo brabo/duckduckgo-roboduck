@@ -1,5 +1,10 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	- Restructure of reply
+
+0.002
 	- Added rules ;)
+
+0.001
 	- Base functionality with gate to DDG

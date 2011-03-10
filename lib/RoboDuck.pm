@@ -49,20 +49,22 @@ event irc_bot_addressed => sub {
 	if ($msg =~ /your order/i or $msg =~ /your rules/i) {
 		$reply = "1. Serve the public trust, 2. Protect the innocent, 3. Uphold the law, 4. .... and dont track you! http://donttrack.us/";
 	} elsif ($zci = $self->ddg->zci($msg)) {
-		if ($zci->has_abstract) {
-			$reply = $zci->abstract;
+		if ($zci->has_definition) {
+			$reply = $zci->definition;
+			$reply .= " (".$zci->definition_source.")" if $zci->has_definition_source;
+		} elsif ($zci->has_abstract_text) {
+			$reply = $zci->abstract_text;
 			$reply .= " (".$zci->abstract_source.")" if $zci->has_abstract_source;
-			$reply .= " ".$zci->abstract_url if $zci->has_abstract_url;
 		} elsif ($zci->has_answer) {
 			$reply = $zci->answer;
 			$reply .= " (".$zci->answer_type.")";
-		} elsif ($zci->has_definition) {
-			$reply = $zci->definition;
-			$reply .= " (".$zci->definition_source.")" if $zci->has_definition_source;
-			$reply .= " ".$zci->definition_url if $zci->has_definition_url;
+		} elsif ($zci->has_heading) {
+			$reply = $zci->heading;
 		} else {
 			$reply = "no clue...";
 		}
+		$reply .= " ".$zci->definition_url if $zci->has_definition_url;
+		$reply .= " ".$zci->abstract_url if $zci->has_abstract_url;
 	} else {
 		$reply = '0 :(';
 	}
