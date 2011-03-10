@@ -1,20 +1,43 @@
 package RoboDuck;
+# ABSTRACT: The IRC bot of the #duckduckgo Channel
+
+sub POE::Kernel::USE_SIGCHLD () { 1 }
 
 use Moses;
 use namespace::autoclean;
+use Cwd;
 
 our $VERSION ||= '0.0development';
 
 use WWW::DuckDuckGo;
 
-server 'irc.freenode.net';
-nickname 'RoboDuck';
+with qw(
+	MooseX::Daemonize
+);
+
+server $ENV{USER} eq 'roboduck' ? 'irc.freenode.net' : 'irc.perl.org';
+nickname $ENV{USER} eq 'roboduck' ? 'RoboDuck' : 'RoboDuckDev';
 channels '#duckduckgo';
+username 'duckduckgo';
+
+after start => sub {
+	my $self = shift;
+	return unless $self->is_daemon;
+	# Required, elsewhere your POE goes nuts
+	POE::Kernel->has_forked if !$self->foreground;
+	POE::Kernel->run;
+};
 
 has ddg => (
 	isa => 'WWW::DuckDuckGo',
 	is => 'rw',
+	traits => [ 'NoGetopt' ],
+	lazy => 1,
 	default => sub { WWW::DuckDuckGo->new( http_agent_name => __PACKAGE__.'/'.$VERSION ) },
+);
+
+has '+pidbase' => (
+	default => sub { getcwd },
 );
 
 event irc_bot_addressed => sub {
@@ -37,7 +60,5 @@ event irc_bot_addressed => sub {
 		$self->privmsg( $channel => "$nick: 0 :(" );
 	}
 };
-
-__PACKAGE__->run unless caller;
 
 1;

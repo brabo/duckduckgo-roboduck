@@ -1,0 +1,11 @@
+#!/bin/sh
+
+CURRENT_DATE_FILENAME=$( date +%Y%m%d_%H%M%S )
+
+scp $1 roboduck@axolotl.metazoa.de:~/
+ssh -t roboduck@axolotl.metazoa.de "(
+	eval \$(perl -I\$HOME/perl5/lib/perl5 -Mlocal::lib) &&
+	roboduck stop &&
+	cpanm $1 &&
+	roboduck start
+)"

@@ -1,2 +1,4 @@
 RoboDuck-*
 .build
+*.pid
+*.log
