@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.004     2011-03-16 18:08:41 Europe/Berlin
+
 0.003     2011-03-10 20:16:54 Europe/Berlin
 	- Restructure of reply
 
