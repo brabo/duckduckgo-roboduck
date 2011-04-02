@@ -2,3 +2,4 @@ RoboDuck-*
 .build
 *.pid
 *.log
+karma_stats.db

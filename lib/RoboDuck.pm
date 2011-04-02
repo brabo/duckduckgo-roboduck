@@ -11,6 +11,8 @@ our $VERSION ||= '0.0development';
 
 use WWW::DuckDuckGo;
 use POE::Component::IRC::Plugin::Karma;
+use Cwd qw( getcwd );
+use File::Spec;
 
 with qw(
 	MooseX::Daemonize
@@ -20,7 +22,12 @@ server $ENV{USER} eq 'roboduck' ? 'irc.freenode.net' : 'irc.perl.org';
 nickname $ENV{USER} eq 'roboduck' ? 'RoboDuck' : 'RoboDuckDev';
 channels '#duckduckgo';
 username 'duckduckgo';
-plugins ( 'Karma' => POE::Component::IRC::Plugin::Karma->new( extrastats => 1 ) );
+plugins (
+	'Karma' => POE::Component::IRC::Plugin::Karma->new(
+		extrastats => 1,
+		sqlite => File::Spec->catfile( getcwd(), 'karma_stats.db' ),
+	),
+);
 
 after start => sub {
 	my $self = shift;
