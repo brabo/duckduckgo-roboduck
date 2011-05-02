@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.008     2011-05-02 22:13:53 Europe/Berlin
 	- Hups
 
 0.007     2011-05-02 22:12:33 Europe/Berlin
