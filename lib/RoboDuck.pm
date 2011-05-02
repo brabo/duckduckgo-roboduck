@@ -55,7 +55,9 @@ event irc_bot_addressed => sub {
 	$self->debug($nick.' told me "'.$msg.'" on '.$channel);
 	my $reply;
 	my $zci;
-	if ($msg =~ /your order/i or $msg =~ /your rules/i) {
+	if (!$msg) {
+		$reply = "$nick: I'm here in version ".$VERSION ;
+	} elsif ($msg =~ /your order/i or $msg =~ /your rules/i) {
 		$reply = "1. Serve the public trust, 2. Protect the innocent, 3. Uphold the law, 4. .... and dont track you! http://donttrack.us/";
 	} elsif ($zci = $self->ddg->zci($msg)) {
 		if ($zci->has_answer) {
