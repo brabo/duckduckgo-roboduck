@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.007     2011-05-02 22:12:33 Europe/Berlin
 	- Fixed crasher
 
 0.006     2011-04-16 06:04:03 Europe/Berlin
