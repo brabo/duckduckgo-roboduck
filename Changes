@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+	- Hups
 
 0.007     2011-05-02 22:12:33 Europe/Berlin
 	- Fixed crasher

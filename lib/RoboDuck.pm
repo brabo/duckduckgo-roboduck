@@ -56,7 +56,7 @@ event irc_bot_addressed => sub {
 	my $reply;
 	my $zci;
 	if (!$msg) {
-		$reply = "$nick: I'm here in version ".$VERSION ;
+		$reply = "I'm here in version ".$VERSION ;
 	} elsif ($msg =~ /your order/i or $msg =~ /your rules/i) {
 		$reply = "1. Serve the public trust, 2. Protect the innocent, 3. Uphold the law, 4. .... and dont track you! http://donttrack.us/";
 	} elsif ($zci = $self->ddg->zci($msg)) {
