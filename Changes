@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.009     2011-05-13 02:14:26 Europe/Berlin
 	- Switched to roboduck@dukgo.com
 
 0.008     2011-05-02 22:13:53 Europe/Berlin
