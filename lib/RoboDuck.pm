@@ -18,8 +18,12 @@ with qw(
 	MooseX::Daemonize
 );
 
+if ($ENV{ROBODUCK_XMPP_JID} and $ENV{ROBODUCK_XMPP_PASSWORD}) {
+	with 'RoboDuck::XMPP';
+}
+
 server $ENV{USER} eq 'roboduck' ? 'irc.freenode.net' : 'irc.perl.org';
-nickname $ENV{USER} eq 'roboduck' ? 'RoboDuck' : 'RoboDuckDev';
+nickname defined $ENV{ROBODUCK_NICKNAME} ? $ENV{ROBODUCK_NICKNAME} : $ENV{USER} eq 'roboduck' ? 'RoboDuck' : 'RoboDuckDev';
 channels '#duckduckgo';
 username 'duckduckgo';
 plugins (
