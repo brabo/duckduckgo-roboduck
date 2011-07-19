@@ -54,6 +54,26 @@ has '+pidbase' => (
 	default => sub { getcwd },
 );
 
+event irc_public => sub {
+	my ( $self, $nickstr, $channels, $msg ) = @_[ OBJECT, ARG0, ARG1, ARG2 ];
+	if ($msg =~ /^!yesorno /i) {
+		my $zci = $self->ddg->zci("yes or no");
+		for (@{$channels}) {
+			$self->privmsg( $_ => "The almighty DuckOracle says..." );
+		}
+		if ($zci->answer =~ /^no /) {
+			for (@{$channels}) {
+				$self->delay_add( say_later => 2, $_, "... no" );
+			}
+		} else {
+			for (@{$channels}) {
+				$self->delay_add( say_later => 2, $_, "... yes" );
+			}
+		}
+		return;
+	}
+};
+
 event irc_bot_addressed => sub {
 	my ( $self, $nickstr, $channel, $msg ) = @_[ OBJECT, ARG0, ARG1, ARG2 ];
 	my ( $nick ) = split /!/, $nickstr;
@@ -65,15 +85,6 @@ event irc_bot_addressed => sub {
 			$reply = "I'm here in version ".$VERSION ;
 		} elsif ($msg =~ /your order/i or $msg =~ /your rules/i) {
 			$reply = "1. Serve the public trust, 2. Protect the innocent, 3. Uphold the law, 4. .... and dont track you! http://donttrack.us/";
-		} elsif ($msg =~ /^!yesorno /i) {
-			$zci = $self->ddg->zci("yes or no");
-			$self->privmsg( $channel => "The almighty DuckOracle says..." );
-			if ($zci->answer eq 'no (random)') {
-				$self->delay_add( say_later => 2, $channel, "... no" );
-			} else {
-				$self->delay_add( say_later => 2, $channel, "... yes" );
-			}
-			return;
 		} elsif ($zci = $self->ddg->zci($msg)) {
 			if ($zci->has_answer) {
 				$reply = $zci->answer;
