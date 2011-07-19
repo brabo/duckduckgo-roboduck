@@ -13,6 +13,7 @@ use WWW::DuckDuckGo;
 use POE::Component::IRC::Plugin::Karma;
 use Cwd qw( getcwd );
 use File::Spec;
+use Try::Tiny;
 
 with qw(
 	MooseX::Daemonize
@@ -59,31 +60,52 @@ event irc_bot_addressed => sub {
 	$self->debug($nick.' told me "'.$msg.'" on '.$channel);
 	my $reply;
 	my $zci;
-	if (!$msg) {
-		$reply = "I'm here in version ".$VERSION ;
-	} elsif ($msg =~ /your order/i or $msg =~ /your rules/i) {
-		$reply = "1. Serve the public trust, 2. Protect the innocent, 3. Uphold the law, 4. .... and dont track you! http://donttrack.us/";
-	} elsif ($zci = $self->ddg->zci($msg)) {
-		if ($zci->has_answer) {
-			$reply = $zci->answer;
-			$reply .= " (".$zci->answer_type.")";
-		} elsif ($zci->has_definition) {
-			$reply = $zci->definition;
-			$reply .= " (".$zci->definition_source.")" if $zci->has_definition_source;
-		} elsif ($zci->has_abstract_text) {
-			$reply = $zci->abstract_text;
-			$reply .= " (".$zci->abstract_source.")" if $zci->has_abstract_source;
-		} elsif ($zci->has_heading) {
-			$reply = $zci->heading;
+	try {
+		if (!$msg) {
+			$reply = "I'm here in version ".$VERSION ;
+		} elsif ($msg =~ /your order/i or $msg =~ /your rules/i) {
+			$reply = "1. Serve the public trust, 2. Protect the innocent, 3. Uphold the law, 4. .... and dont track you! http://donttrack.us/";
+		} elsif ($msg =~ /^!yesorno /i) {
+			$zci = $self->ddg->zci("yes or no");
+			$self->privmsg( $channel => "The almighty DuckOracle says..." );
+			if ($zci->answer eq 'no (random)') {
+				$self->delay_add( say_later => 2, $channel, "... no" );
+			} else {
+				$self->delay_add( say_later => 2, $channel, "... yes" );
+			}
+			return;
+		} elsif ($zci = $self->ddg->zci($msg)) {
+			if ($zci->has_answer) {
+				$reply = $zci->answer;
+				$reply .= " (".$zci->answer_type.")";
+			} elsif ($zci->has_definition) {
+				$reply = $zci->definition;
+				$reply .= " (".$zci->definition_source.")" if $zci->has_definition_source;
+			} elsif ($zci->has_abstract_text) {
+				$reply = $zci->abstract_text;
+				$reply .= " (".$zci->abstract_source.")" if $zci->has_abstract_source;
+			} elsif ($zci->has_heading) {
+				$reply = $zci->heading;
+			} else {
+				$reply = "no clue...";
+			}
+			$reply .= " ".$zci->definition_url if $zci->has_definition_url;
+			$reply .= " ".$zci->abstract_url if $zci->has_abstract_url;
 		} else {
-			$reply = "no clue...";
+			$reply = '0 :(';
 		}
-		$reply .= " ".$zci->definition_url if $zci->has_definition_url;
-		$reply .= " ".$zci->abstract_url if $zci->has_abstract_url;
-	} else {
-		$reply = '0 :(';
+		$self->privmsg( $channel => "$nick: ".$reply );
+	} catch {
+		$self->privmsg( $channel => "doh!" );
 	}
-	$self->privmsg( $channel => "$nick: ".$reply );
+};
+
+event say_later => sub {
+	my ( $self, $channel, $msg ) = @_[ OBJECT, ARG0, ARG1 ];
+	$self->privmsg( $channel => $msg );
+};
+
+event 'no' => sub {
 };
 
 1;
