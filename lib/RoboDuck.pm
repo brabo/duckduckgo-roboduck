@@ -14,6 +14,7 @@ use POE::Component::IRC::Plugin::Karma;
 use Cwd qw( getcwd );
 use File::Spec;
 use Try::Tiny;
+use HTML::Entities;
 
 with qw(
 	MooseX::Daemonize
@@ -105,6 +106,7 @@ event irc_bot_addressed => sub {
 		} else {
 			$reply = '0 :(';
 		}
+		$reply = decode_entities($reply);
 		$self->privmsg( $channel => "$nick: ".$reply );
 	} catch {
 		$self->privmsg( $channel => "doh!" );
